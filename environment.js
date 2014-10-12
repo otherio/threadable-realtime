@@ -33,6 +33,8 @@ module.exports = {
           return;
         }
 
+        var userIdsToLog = msg.user_ids;
+
         // if user ids were specified, make sure this user is included.
         if (msg.user_ids !== undefined && msg.user_ids !== null) {
           if (msg.user_ids.indexOf(currentUserId) == -1) {
@@ -42,7 +44,7 @@ module.exports = {
           delete msg.user_ids; //don't include these
         }
 
-        console.log('Sending ' + msg.action + '-' + msg.target + ' for organization: ' + msg.organization_id + ', users: ' + msg.user_ids);
+        console.log('Sending ' + msg.action + '-' + msg.target + ' for organization: ' + msg.organization_id + ', users: ' + userIdsToLog);
         socket.emit('application_update', msg);
       });
 
