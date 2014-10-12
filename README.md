@@ -4,6 +4,7 @@ Adapted from https://github.com/mikeatlas/realtime-server
 
 To set this up:
 
+    brew install node
     gem install foreman
     sudo npm install
     foreman start
