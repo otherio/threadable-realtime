@@ -3,10 +3,13 @@ module.exports = {
   loadSocketIo: function loadSocketIo(redis) {
 
     var port = process.env.PORT;
+    var app  = require('express')();
+    var http = require('http').Server(app);
+    var io   = require('socket.io')(http);
 
-    console.log('STARTING ON PORT: ' + port);
-
-    var io = require('socket.io').listen(Number(port));
+    http.listen(Number(port), function(){
+      console.log('Express server listening on *:' + port);
+    });
 
     io.on('connection', function(socket) {
 
