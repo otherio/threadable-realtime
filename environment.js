@@ -11,6 +11,11 @@ module.exports = {
       console.log('Express server listening on *:' + port);
     });
 
+    app.get('/status', function(req, res){
+      console.log('Returned status check');
+      res.send('Realtime relay. Status: up.');
+    });
+
     io.on('connection', function(socket) {
 
       socket.on('realtime_user_id_connected', function(message) {
