@@ -2,7 +2,7 @@ module.exports = {
 
   loadSocketIo: function loadSocketIo(redis) {
 
-    var port = process.env.PORT || 5001;
+    var port = process.env.PORT;
 
     console.log('STARTING ON PORT: ' + port);
 
@@ -12,6 +12,18 @@ module.exports = {
 
       socket.on('realtime_user_id_connected', function(message) {
         console.log('client connected, user: ' + message.userId);
+      });
+
+      socket.on('ping', function(message) {
+        socket.emit('pong');
+      });
+
+      socket.on('close', function(){
+        if (socket.request === undefined) {
+          console.log('socket closed, without session');
+        } else {
+          console.log('socket closed for user: ' + socket.request.session['user_id']);
+        }
       });
 
       redis.sub.on('message', function(channel, message) {
