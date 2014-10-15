@@ -30,39 +30,39 @@ module.exports = {
         if (socket.request === undefined) {
           console.log('socket closed, without session');
         } else {
-          console.log('socket closed for user: ' + socket.request.session['user_id']);
+          console.log('socket closed for user: ' + socket.request.session.user_id);
         }
       });
 
       redis.sub.on('message', function(channel, message) {
-         // can't deliver a message to a socket with no handshake(session) established
+        // can't deliver a message to a socket with no handshake(session) established
         if (socket.request === undefined) {
           return;
         }
 
-        msg = JSON.parse(message);
+        var parsedMessage = JSON.parse(message);
 
-        var currentUserId = socket.request.session['user_id'];
-        var organizationIds = socket.request.session['organization_ids'];
+        var currentUserId = socket.request.session.user_id;
+        var organizationIds = socket.request.session.organization_ids;
 
         // is this message for an organization we're not part of?
-        if(organizationIds.indexOf(msg.organization_id) == -1) {
+        if(organizationIds.indexOf(parsedMessage.organization_id) == -1) {
           return;
         }
 
-        var userIdsToLog = msg.user_ids;
+        var userIdsToLog = parsedMessage.user_ids;
 
         // if user ids were specified, make sure this user is included.
-        if (msg.user_ids !== undefined && msg.user_ids !== null) {
-          if (msg.user_ids.indexOf(currentUserId) == -1) {
+        if (parsedMessage.user_ids !== undefined && parsedMessage.user_ids !== null) {
+          if (parsedMessage.user_ids.indexOf(currentUserId) == -1) {
             return;
           }
 
-          delete msg.user_ids; //don't include these
+          delete parsedMessage.user_ids; //don't include these
         }
 
-        console.log('Sending ' + msg.action + '-' + msg.target + ' for organization: ' + msg.organization_id + ', users: ' + userIdsToLog);
-        socket.emit('application_update', msg);
+        console.log('Sending ' + parsedMessage.action + '-' + parsedMessage.target + ' for organization: ' + parsedMessage.organization_id + ', users: ' + userIdsToLog);
+        socket.emit('application_update', parsedMessage);
       });
 
     });
@@ -73,6 +73,8 @@ module.exports = {
   authorize: function authorize(io, redis) {
     io.use(function(socket, next) {
 
+      // one shitshow
+      // i bet express has a thing for extracting query params.
       var url = require('url');
       requestUrl = url.parse(socket.request.url);
       requestQuery = requestUrl.query;
@@ -87,8 +89,8 @@ module.exports = {
         }
       }
 
-      var token = params["token"];
-      var userId = params["userId"];
+      var token = params.token;
+      var userId = params.userId;
 
       // retrieve session from redis using the supplied session token
       redis.getSet.hget([("realtime_session-" + userId), token],
