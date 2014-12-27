@@ -12,7 +12,6 @@
     "underscore": "1.5.2",
     "cookie": "0.1.x",
     "sentry-node": "0.2.x",
-    "nodetime": "0.8.x",
     "nodemon": "1.x",
     "forever": "0.10.x",
     "forever-monitor": "1.2.x",
